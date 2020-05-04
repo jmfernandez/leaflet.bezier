@@ -42,7 +42,14 @@ L.SVG.include({
 });
 
 let Bezier = L.Path.extend({
-    options: {},
+    options: {
+	delay: {
+		midway: 2000,
+		end: 7000
+	},
+	stopAt: 'three',
+	loop: false,
+    },
     initialize: function (path, icon, options) {
 
         if (!path.mid || path.mid[0] === undefined) {
@@ -91,7 +98,30 @@ let Bezier = L.Path.extend({
         let half_path_length = full_path_length / 2;
         let third_path_length = full_path_length / 3;
         let forth_path_length = full_path_length / 4;
-
+	
+	let midway_length = forth_path_length;
+	let endway_length = half_path_length;
+	
+	console.log(this);
+	
+	let stopAt = this.options.stopAt ? this.options.stopAt : 'three';
+	if(this.options.stopAt) {
+		switch(this.options.stopAt) {
+			case 'four':
+				midway_length = third_path_length;
+				endway_length = third_path_length*2;
+				break;
+			case 'six':
+				midway_length = half_path_length;
+				endway_length = full_path_length;
+				break;
+			case 'three':
+			default:
+				midway_length = forth_path_length;
+				endway_length = half_path_length;
+				break;
+		}
+	}
 
         let width = forth_path_length / this._map.getZoom();
         let height = forth_path_length / this._map.getZoom();
@@ -101,43 +131,52 @@ let Bezier = L.Path.extend({
 
 
         let last_step = 0;
+	
+	let animationMidway = (this.options.delay && this.options.delay.midway) ? this.options.delay.midway : 2500;
+	let animationEnd = (this.options.delay && this.options.delay.end) ? this.options.delay.end : 7000;
+	let doLoop = this.options.doLoop ? true : false;
+	let doAnimation;
+	doAnimation = (doLoop,midway_length,endway_length,animationMidway,animationEnd) => {
+		Snap.animate(0, midway_length, function (step) {
+
+		    //show image when plane start to animate
+		    spaceship_img.attr({
+			visibility: "visible"
+		    });
+
+		    spaceship_img.attr({width: width, height: height, class: self.icon.class});
+
+		    last_step = step;
+
+		    let moveToPoint = Snap.path.getPointAtLength(flight_path, step);
+
+		    let x = moveToPoint.x - (width / 2);
+		    let y = moveToPoint.y - (height / 2);
 
 
-        Snap.animate(0, forth_path_length, function (step) {
+		    spaceship.transform('translate(' + x + ',' + y + ') rotate(' + (moveToPoint.alpha - 90) + ', ' + width / 2 + ', ' + height / 2 + ')');
 
-            //show image when plane start to animate
-            spaceship_img.attr({
-                visibility: "visible"
-            });
+		}, animationMidway, mina.easeout, function () {
 
-            spaceship_img.attr({width: width, height: height, class: self.icon.class});
+		    Snap.animate(midway_length, endway_length, function (step) {
 
-            last_step = step;
+			last_step = step;
+			let moveToPoint = Snap.path.getPointAtLength(flight_path, step);
 
-            let moveToPoint = Snap.path.getPointAtLength(flight_path, step);
+			let x = moveToPoint.x - width / 2;
+			let y = moveToPoint.y - height / 2;
+			spaceship.transform('translate(' + x + ',' + y + ') rotate(' + (moveToPoint.alpha - 90) + ', ' + width / 2 + ', ' + height / 2 + ')');
+		    }, animationEnd, mina.easein, function () {
+			//done
+			if(doLoop) {
+				setTimeout(doAnimation,10,doLoop,midway_length,endway_length,animationMidway,animationEnd);
+			}
+		    });
 
-            let x = moveToPoint.x - (width / 2);
-            let y = moveToPoint.y - (height / 2);
-
-
-            spaceship.transform('translate(' + x + ',' + y + ') rotate(' + (moveToPoint.alpha - 90) + ', ' + width / 2 + ', ' + height / 2 + ')');
-
-        }, 2500, mina.easeout, function () {
-
-            Snap.animate(forth_path_length, half_path_length, function (step) {
-
-                last_step = step;
-                let moveToPoint = Snap.path.getPointAtLength(flight_path, step);
-
-                let x = moveToPoint.x - width / 2;
-                let y = moveToPoint.y - height / 2;
-                spaceship.transform('translate(' + x + ',' + y + ') rotate(' + (moveToPoint.alpha - 90) + ', ' + width / 2 + ', ' + height / 2 + ')');
-            }, 7000, mina.easein, function () {
-                //done
-
-            });
-
-        });
+		});
+	};
+	
+	doAnimation(doLoop,midway_length,endway_length,animationMidway,animationEnd);
 
 
     },
@@ -153,7 +192,7 @@ let Bezier = L.Path.extend({
     },
     getMidPoint: function (from, to, deep, round_side = 'LEFT_ROUND') {
 
-        let offset = 3.14;
+        let offset = Math.PI;
 
         if (round_side === 'RIGHT_ROUND')
             offset = offset * -1;

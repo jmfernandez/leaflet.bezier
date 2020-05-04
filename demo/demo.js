@@ -81,7 +81,19 @@ $(function () {
 		]
 	};
 	L.bezierGeoJSON(testGeo,{
-		style: dash_straight,
+		style: {
+			color: 'rgb(145, 146, 150)',
+			fillColor: 'rgb(145, 146, 150)',
+			dashArray: 8,
+			opacity: 0.8,
+			weight: '2',
+			stopAt: 'four',
+			delay: {
+				midway: 1000,
+				end: 2000
+			},
+			doLoop: true
+		},
 		onEachFeature: function(feature,layer) {
 			layer.on({
 				mouseover: () => console.log("Hola"),
@@ -90,7 +102,7 @@ $(function () {
 			});
 		},
 		icon: {
-		    path: "plane.png"
+		    path: "map-arrows.svg"
 		}
 	}).addTo(map);
 });
