@@ -13,10 +13,10 @@ $(function () {
         fillColor: 'rgb(145, 146, 150)',
         dashArray: 8,
         opacity: 0.8,
-        weight: '1',
+        weight: '2',
     };
 
-    L.bezier({
+    let bez = L.bezier({
         path: [
             [
                 {lat: 7.8731, lng: 80.7718, slide: 'RIGHT_ROUND'},//Sri Lanka
@@ -43,7 +43,54 @@ $(function () {
         icon: {
             path: "plane.png"
         }
-    }, dash_straight).addTo(map);
+    }, dash_straight);
 
+    bez.eachLayer(function(layer) {
+	layer.on({
+		mouseover: function(e) {
+			let layer = e.target;
+			console.log(e);
+			L.popup().setLatLng(e.latlng).setContent("Hola "+e.latlng.toString()).openOn(map);
+			//
+			//layer.bindTooltip("Hola").openTooltip();
+		}
+	});
+	//console.log(layer);
+	//layer.bindTooltip("Hola");
+    });
 
+    bez.addTo(map);
+	
+	var testGeo = {
+		features: [
+			{
+				type: 'Feature',
+				properties: {
+					uno: 'dos',
+					tres: 4
+				},
+				geometry: {
+					type: 'LineString',
+					coordinates: [
+						[1.9684260940067402,41.482757260358255],
+						[2.123007428710469,41.4805952548463],
+						[1.9684260940067402,41.482757260358255]
+					]
+				}
+			}
+		]
+	};
+	L.bezierGeoJSON(testGeo,{
+		style: dash_straight,
+		onEachFeature: function(feature,layer) {
+			layer.on({
+				mouseover: () => console.log("Hola"),
+				mouseout: () => console.log("Adios"),
+				click: () => console.log("Ay!")
+			});
+		},
+		icon: {
+		    path: "plane.png"
+		}
+	}).addTo(map);
 });

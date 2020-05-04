@@ -253,4 +253,89 @@ L.bezier = function (config, options) {
 
 };
 
+var BezierGeoJSON = L.GeoJSON.extend({
+	addData: function (geojson) {
+		var features = L.Util.isArray(geojson) ? geojson : geojson.features,
+		    i, len, feature;
 
+		if (features) {
+			// Delegating in the original method for the iteration
+			return L.GeoJSON.prototype.addData.call(this,geojson);
+		}
+		
+		var options = this.options;
+		
+		// Nothing to do
+		if (options.filter && !options.filter(geojson)) { return this; }
+		
+		// Deciding whether to follow
+		var geometry = geojson.type === 'Feature' ? geojson.geometry : geojson,
+		    coords = geometry ? geometry.coordinates : null;
+
+		// Nothing to do (again)
+		if (!coords && !geometry) {
+			return this;
+		}
+		
+		if(geometry.type !== 'LineString') {
+			// Delegating in the original method for anything different
+			// to a LineString
+			return L.GeoJSON.prototype.addData.call(this,geojson);
+		}
+		
+		// This piece of code is only focused on LineString
+		var layers = [],
+		    pointToLayer = options && options.pointToLayer,
+		    _coordsToLatLng = options && options.coordsToLatLng || L.GeoJSON.coordsToLatLng,
+		    latlng, latlngs, i, len;
+		
+		latlngs = L.GeoJSON.coordsToLatLngs(coords, 0, _coordsToLatLng);
+		console.log(latlngs);
+
+		var icon = undefined;
+		if(features && features.icon) {
+			icon = features.icon;
+		} else if(options.style && options.style.icon) {
+			icon = options.style.icon;
+		} else if(options.icon) {
+			icon = options.icon;
+		}
+		var style = options.style ? options.style : options;
+		var bLayers = [];
+		
+		var prevLatLng = latlngs[0];
+		latlngs.forEach((latlng,iLL) => {
+			if(iLL > 0) {
+				let bez = new Bezier({
+						from: prevLatLng,
+						to: latlng
+					},
+					icon,
+					style
+				);
+				if (options.onEachFeature) {
+					options.onEachFeature(geojson, bez);
+				}
+				bLayers.push(bez);
+				prevLatLng = latlng;
+			}
+		});
+		let layer = L.layerGroup(bLayers);
+		layer.feature = L.GeoJSON.asFeature(geojson);
+		
+		layer.defaultOptions = layer.options;
+		this.resetStyle(layer);
+		
+		if (options.onEachFeature) {
+			options.onEachFeature(geojson, layer);
+		}
+		
+		return this.addLayer(layer);
+	},
+});
+
+function bezierGeoJSON(geojson, options) {
+	return new BezierGeoJSON(geojson, options);
+}
+
+L.bezierGeoJSON = bezierGeoJSON;
