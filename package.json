@@ -2,7 +2,7 @@
   "name": "leaflet.bezier",
   "version": "0.2.0-20200504",
   "description": "Leaflet curve line",
-  "main": "dist/leaflet.bezier.js",
+  "main": "src/leaflet.bezier.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lifeeka/leaflet.bezier.git"
+    "url": "git+https://github.com/jmfernandez/leaflet.bezier.git"
   },
   "keywords": [
     "Leaflet",
@@ -30,9 +30,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lifeeka/leaflet.bezier/issues"
+    "url": "https://github.com/jmfernandez/leaflet.bezier/issues"
   },
-  "homepage": "https://github.com/lifeeka/leaflet.bezier#readme",
+  "homepage": "https://github.com/jmfernandez/leaflet.bezier#readme",
   "dependencies": {
     "snapsvg": "^0.5.1"
   },
