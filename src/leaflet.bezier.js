@@ -346,6 +346,7 @@ var BezierGeoJSON = L.GeoJSON.extend({
 		var bLayers = [];
 		
 		var prevLatLng = latlngs[0];
+		var layer_feature = L.GeoJSON.asFeature(geojson);
 		latlngs.forEach((latlng,iLL) => {
 			if(iLL > 0) {
 				let bez = new Bezier({
@@ -355,6 +356,9 @@ var BezierGeoJSON = L.GeoJSON.extend({
 					icon,
 					style
 				);
+				bez.feature = layer_feature;
+				bez.defaultOptions = bez.options;
+				this.resetStyle(bez);
 				if (options.onEachFeature) {
 					options.onEachFeature(geojson, bez);
 				}
@@ -363,7 +367,7 @@ var BezierGeoJSON = L.GeoJSON.extend({
 			}
 		});
 		let layer = L.layerGroup(bLayers);
-		layer.feature = L.GeoJSON.asFeature(geojson);
+		layer.feature = layer_feature;
 		
 		layer.defaultOptions = layer.options;
 		this.resetStyle(layer);
