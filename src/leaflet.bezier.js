@@ -43,6 +43,7 @@ L.SVG.include({
 
 let Bezier = L.Path.extend({
     options: {
+        animate: true,
 	delay: {
 		midway: 2000,
 		end: 7000
@@ -60,6 +61,9 @@ let Bezier = L.Path.extend({
         this._initialUpdate = true;
         this.setPath(path);
         this.icon = icon;
+        if(this.options.animate && !icon) {
+		this.options.animate = false;
+	}
 
     },
     //Juast after path is added
@@ -246,7 +250,9 @@ let Bezier = L.Path.extend({
     _updatePath: function () {
         //animated plane
         let path = this._renderer._updatecurve(this);
-        this.setAnimatePlane(path);
+        if(this.options.animate) {
+		this.setAnimatePlane(path);
+	}
     },
     _project: function () {
 

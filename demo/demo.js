@@ -91,7 +91,7 @@ $(function () {
 				midway: 1000,
 				end: 2000
 			},
-			loops: 10
+			loops: 10,
 		},
 		onEachFeature: function(feature,layer) {
 			layer.on({
@@ -100,8 +100,5 @@ $(function () {
 				click: () => console.log("Ay!")
 			});
 		},
-		icon: {
-		    path: "map-arrows.svg"
-		}
 	}).addTo(map);
 });
