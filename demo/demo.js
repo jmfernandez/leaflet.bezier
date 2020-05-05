@@ -49,7 +49,6 @@ $(function () {
 	layer.on({
 		mouseover: function(e) {
 			let layer = e.target;
-			console.log(e);
 			L.popup().setLatLng(e.latlng).setContent("Hola "+e.latlng.toString()).openOn(map);
 			//
 			//layer.bindTooltip("Hola").openTooltip();
@@ -92,7 +91,7 @@ $(function () {
 				midway: 1000,
 				end: 2000
 			},
-			doLoop: true
+			loops: 10
 		},
 		onEachFeature: function(feature,layer) {
 			layer.on({

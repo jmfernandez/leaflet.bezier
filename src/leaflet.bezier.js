@@ -48,7 +48,7 @@ let Bezier = L.Path.extend({
 		end: 7000
 	},
 	stopAt: 'three',
-	loop: false,
+	loops: 0,
     },
     initialize: function (path, icon, options) {
 
@@ -102,8 +102,6 @@ let Bezier = L.Path.extend({
 	let midway_length = forth_path_length;
 	let endway_length = half_path_length;
 	
-	console.log(this);
-	
 	let stopAt = this.options.stopAt ? this.options.stopAt : 'three';
 	if(this.options.stopAt) {
 		switch(this.options.stopAt) {
@@ -134,9 +132,9 @@ let Bezier = L.Path.extend({
 	
 	let animationMidway = (this.options.delay && this.options.delay.midway) ? this.options.delay.midway : 2500;
 	let animationEnd = (this.options.delay && this.options.delay.end) ? this.options.delay.end : 7000;
-	let doLoop = this.options.doLoop ? true : false;
+	let loops = (Number.isInteger(this.options.loops) && this.options.loops > 0) ? this.options.loops : 0;
 	let doAnimation;
-	doAnimation = (doLoop,midway_length,endway_length,animationMidway,animationEnd) => {
+	doAnimation = (loops,midway_length,endway_length,animationMidway,animationEnd) => {
 		Snap.animate(0, midway_length, function (step) {
 
 		    //show image when plane start to animate
@@ -168,15 +166,15 @@ let Bezier = L.Path.extend({
 			spaceship.transform('translate(' + x + ',' + y + ') rotate(' + (moveToPoint.alpha - 90) + ', ' + width / 2 + ', ' + height / 2 + ')');
 		    }, animationEnd, mina.easein, function () {
 			//done
-			if(doLoop) {
-				setTimeout(doAnimation,10,doLoop,midway_length,endway_length,animationMidway,animationEnd);
+			if(loops > 0) {
+				setTimeout(doAnimation,10,loops-1,midway_length,endway_length,animationMidway,animationEnd);
 			}
 		    });
 
 		});
 	};
 	
-	doAnimation(doLoop,midway_length,endway_length,animationMidway,animationEnd);
+	doAnimation(loops,midway_length,endway_length,animationMidway,animationEnd);
 
 
     },
@@ -329,7 +327,6 @@ var BezierGeoJSON = L.GeoJSON.extend({
 		    latlng, latlngs, i, len;
 		
 		latlngs = L.GeoJSON.coordsToLatLngs(coords, 0, _coordsToLatLng);
-		console.log(latlngs);
 
 		var icon = undefined;
 		if(features && features.icon) {
