@@ -374,4 +374,5 @@ function bezierGeoJSON(geojson, options) {
 	return new BezierGeoJSON(geojson, options);
 }
 
+L.BezierGeoJSON = BezierGeoJSON;
 L.bezierGeoJSON = bezierGeoJSON;
