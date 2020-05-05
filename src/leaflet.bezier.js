@@ -277,6 +277,9 @@ let Bezier = L.Path.extend({
 
 });
 
+
+L.Bezier = Bezier;
+
 L.bezier = function (config, options) {
     let paths = [];
     for (let i = 0; config.path.length > i; i++) {
